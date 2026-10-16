@@ -10624,7 +10624,7 @@ addcmd('oldconsole',{},function(args, speaker)
 end)
 
 addcmd("explorer", {"dex"}, function(args, speaker)
-	notify("Loading", "Hold on a sec")
+	--notify("Loading", "Hold on a sec")
 	loadstring(game:HttpGet("https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"))()
 end)
 
