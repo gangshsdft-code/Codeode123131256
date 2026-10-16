@@ -6507,7 +6507,7 @@ local TeleportCheck = false
 Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if KeepInfYield and (not TeleportCheck) and queueteleport then
 		TeleportCheck = true
-		loadstring(game:HttpGet("[https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt](https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt)"))()
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt'))()")
 		
 		task.delay(1.5,function()
 			print("SCANNING")
@@ -6523,7 +6523,7 @@ Players.LocalPlayer.OnTeleport:Connect(function(State)
 			if #Players:GetPlayers() <= 1 and fb == false then
 				Players.LocalPlayer:Kick("\nRejoining...")
 				task.wait(0.3)
-				TeleportService:Teleport(PlaceId, Players.LocalPlayer)
+				TeleportService:Teleport(PlaceId, Players.LocalPlayer, data)
 			end
 		end)
 	end
@@ -8852,7 +8852,7 @@ addcmd("btools", {}, function(args, speaker)
 end)
 
 addcmd("f3x", {"fex"}, function(args, speaker)
-	loadstring(game:HttpGet("[https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt](https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt)"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/f3x.lua"))()
 end)
 
 addcmd("partpath", {"partname"}, function(args, speaker)
