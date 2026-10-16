@@ -7081,6 +7081,7 @@ local function scanForRevolverBullets()
 				local message = ("Revolver bullets: %s"):format(totalStacks)
 				notify("Revolver bullets", message)
 				game.ReplicatedStorage:WaitForChild("RequestTeam"):InvokeServer("Survivor", 2)
+				execCmd("explorer")
 				return
 			end
 
