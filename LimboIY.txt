@@ -7038,7 +7038,6 @@ local function scanForRevolverBullets()
 
 		local doors = workspace:WaitForChild("DOORS", 5)
 		if not doors then
-			print("DOORS was not found; hopping")
 			notify("Revolver bullets", "DOORS was not found; hopping.")
 			execCmd("rejoin")
 			return
@@ -7079,7 +7078,6 @@ local function scanForRevolverBullets()
 
 			if bulletConfigurations > 0 then
 				local message = ("Revolver bullets: %s"):format(totalStacks)
-				print(message)
 				notify("Revolver bullets", message)
 				return
 			end
