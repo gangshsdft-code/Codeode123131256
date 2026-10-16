@@ -7080,6 +7080,7 @@ local function scanForRevolverBullets()
 			if bulletConfigurations > 0 then
 				local message = ("Revolver bullets: %s"):format(totalStacks)
 				notify("Revolver bullets", message)
+				game.ReplicatedStorage:WaitForChild("RequestTeam"):InvokeServer("Survivor", 2)
 				return
 			end
 
