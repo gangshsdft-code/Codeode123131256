@@ -6505,34 +6505,11 @@ end)
 
 local TeleportCheck = false
 local LIMBO_SOURCE_URL = "https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt"
-local LIMBO_REVOLVER_SCAN_FLAG = "LimboScanForRevolverBullets"
-
-local function getLimboEnvironment()
-	local environment = _G
-	pcall(function()
-		environment = getgenv()
-	end)
-	return environment
-end
-
-local function queueLimboSource()
-	local shouldScan = getLimboEnvironment()[LIMBO_REVOLVER_SCAN_FLAG] == true
-	local queuedSource = ([[
-local environment = _G
-pcall(function()
-	environment = getgenv()
-end)
-environment.%s = %s
-loadstring(game:HttpGet(%q))()
-]]):format(LIMBO_REVOLVER_SCAN_FLAG, tostring(shouldScan), LIMBO_SOURCE_URL)
-
-	queueteleport(queuedSource)
-end
 
 Players.LocalPlayer.OnTeleport:Connect(function()
 	if KeepInfYield and not TeleportCheck and queueteleport then
 		TeleportCheck = true
-		queueLimboSource()
+		queueteleport(("loadstring(game:HttpGet(%q))()"):format(LIMBO_SOURCE_URL))
 	end
 end)
 
@@ -6995,7 +6972,6 @@ if ok and typeof(data) == "CFrame" then
 end
 ]]
 addcmd("rejoin", {"rj"}, function(args, speaker)
-	getLimboEnvironment()[LIMBO_REVOLVER_SCAN_FLAG] = true
     local data = nil
     if parseBoolean(args[1], false) == true then
         if queueteleport then
@@ -7036,7 +7012,6 @@ addcmd("autorejoin", {"autorj"}, function(args, speaker)
 end)
 
 addcmd("serverhop", {"shop"}, function(args, speaker)
-	getLimboEnvironment()[LIMBO_REVOLVER_SCAN_FLAG] = true
 	-- thanks to Amity for fixing
 	local servers = {}
 	local req = game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
@@ -7057,63 +7032,65 @@ addcmd("serverhop", {"shop"}, function(args, speaker)
 	end
 end)
 
-local function highlightRevolverBullets(doors)
-	local seenModels = {}
-	local bulletCount = 0
-
-	for _, descendant in ipairs(doors:GetDescendants()) do
-		if descendant:IsA("Configuration") and descendant.Name == "Revolver Bullet" then
-			local model = descendant:FindFirstAncestorOfClass("Model")
-			if model and not seenModels[model] then
-				seenModels[model] = true
-				bulletCount += 1
-
-				if not model:FindFirstChild("LimboRevolverBulletHighlight") then
-					local highlight = Instance.new("Highlight")
-					highlight.Name = "LimboRevolverBulletHighlight"
-					highlight.FillColor = Color3.fromRGB(255, 170, 0)
-					highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
-					highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-					highlight.Parent = model
-				end
-			end
-		end
-	end
-
-	return bulletCount
-end
-
-local function scanForRevolverBulletsAfterTeleport()
+local function scanForRevolverBullets()
 	task.spawn(function()
 		print("SCANNING FOR REVOLVER BULLETS")
 
 		local doors = workspace:WaitForChild("DOORS", 10)
 		if not doors then
 			print("DOORS was not found; hopping")
+			notify("Revolver bullets", "DOORS was not found; hopping.")
 			execCmd("serverhop")
 			return
 		end
 
 		local deadline = os.clock() + 10
 		repeat
-			local bulletCount = highlightRevolverBullets(doors)
-			if bulletCount > 0 then
-				getLimboEnvironment()[LIMBO_REVOLVER_SCAN_FLAG] = false
-				print(("FOUND %d REVOLVER BULLET MODEL(S)"):format(bulletCount))
-				notify("Revolver Scan", "Bullet found.")
+			local foundModels = {}
+			local bulletConfigurations = 0
+			local totalStacks = 0
+
+			for _, descendant in ipairs(doors:GetDescendants()) do
+				if descendant:IsA("Configuration") and descendant.Name == "Revolver Bullet" then
+					bulletConfigurations += 1
+
+					local stack = descendant:GetAttribute("Stack")
+					if type(stack) == "number" then
+						totalStacks += stack
+					else
+						warn("Revolver Bullet has no numeric Stack attribute:", descendant:GetFullName())
+					end
+
+					local model = descendant:FindFirstAncestorOfClass("Model")
+					if model and not foundModels[model] then
+						foundModels[model] = true
+
+						if not model:FindFirstChild("LimboRevolverBulletHighlight") then
+							local highlight = Instance.new("Highlight")
+							highlight.Name = "LimboRevolverBulletHighlight"
+							highlight.FillColor = Color3.fromRGB(255, 170, 0)
+							highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+							highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+							highlight.Parent = model
+						end
+					end
+				end
+			end
+
+			if bulletConfigurations > 0 then
+				local message = ("Revolver bullets: %s"):format(totalStacks)
+				print(message)
+				notify("Revolver bullets", message)
 				return
 			end
+
 			task.wait(1)
 		until os.clock() >= deadline
 
 		print("NO REVOLVER BULLETS FOUND; HOPPING")
-		notify("Revolver Scan", "No revolver bullets found; hopping.")
+		notify("Revolver bullets", "None found; hopping.")
 		execCmd("serverhop")
 	end)
-end
-
-if getLimboEnvironment()[LIMBO_REVOLVER_SCAN_FLAG] == true then
-	scanForRevolverBulletsAfterTeleport()
 end
 
 addcmd("exit", {"shutdown", "leave"}, function(args, speaker)
@@ -13479,3 +13456,5 @@ task.spawn(function()
     IntroBackground:Destroy()
     minimizeHolder()
 end)
+
+scanForRevolverBullets()
