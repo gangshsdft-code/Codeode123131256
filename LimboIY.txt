@@ -7067,10 +7067,11 @@ local function scanForRevolverBullets()
 						if not model:FindFirstChild("LimboRevolverBulletHighlight") then
 							local highlight = Instance.new("Highlight")
 							highlight.Name = "LimboRevolverBulletHighlight"
+							highlight.Adornee = model
 							highlight.FillColor = Color3.fromRGB(255, 170, 0)
 							highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
 							highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-							highlight.Parent = model
+							highlight.Parent = game.CoreGui
 						end
 					end
 				end
