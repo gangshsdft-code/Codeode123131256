@@ -8923,7 +8923,7 @@ addcmd("antiafk", {"antiidle"}, function(args, speaker)
 		VirtualInputManager:Destroy()
 	end)
 
-	if not (args[1] and tostring(args[1]) == "nonotify") then notify("Anti Idle", "Anti idle is enabled") end
+	--if not (args[1] and tostring(args[1]) == "nonotify") then notify("Anti Idle", "Anti idle is enabled") end
 end)
 
 addcmd("datalimit", {}, function(args, speaker)
