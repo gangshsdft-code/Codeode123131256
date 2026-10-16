@@ -6507,21 +6507,10 @@ local TeleportCheck = false
 Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if KeepInfYield and (not TeleportCheck) and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()")
+		loadstring(game:HttpGet("[https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt](https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt)"))()
 		
 		task.delay(1.5,function()
 			print("SCANNING")
-			local data = nil
-			if parseBoolean(args[1], false) == true then
-				if queueteleport then
-					if speaker.Character then
-						data = speaker.Character:GetPivot()
-						queueteleport(teleportRespawnHandler)
-					end
-				else
-					notify("Incompatible Exploit", "Your exploit does not support this argument (missing queue_on_teleport)")
-				end
-			end
 			local fB = false
 			for _, v in pairs(workspace:WaitForChild("DOORS"):GetDescendants()) do
 				if v:IsA("Configuration") and v.Name == "Revolver Bullet" then
@@ -6534,7 +6523,7 @@ Players.LocalPlayer.OnTeleport:Connect(function(State)
 			if #Players:GetPlayers() <= 1 and fb == false then
 				Players.LocalPlayer:Kick("\nRejoining...")
 				task.wait(0.3)
-				TeleportService:Teleport(PlaceId, Players.LocalPlayer, data)
+				TeleportService:Teleport(PlaceId, Players.LocalPlayer)
 			end
 		end)
 	end
@@ -8863,7 +8852,7 @@ addcmd("btools", {}, function(args, speaker)
 end)
 
 addcmd("f3x", {"fex"}, function(args, speaker)
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/f3x.lua"))()
+	loadstring(game:HttpGet("[https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt](https://raw.githubusercontent.com/gangshsdft-code/Codeode123131256/main/LimboIY.txt)"))()
 end)
 
 addcmd("partpath", {"partname"}, function(args, speaker)
