@@ -7034,13 +7034,13 @@ end)
 
 local function scanForRevolverBullets()
 	task.spawn(function()
-		notify("Scanning for Revolver Bullets")
+		notify("Scanning", "Scanning for Revolver Bullets...")
 
 		local doors = workspace:WaitForChild("DOORS", 5)
 		if not doors then
 			print("DOORS was not found; hopping")
 			notify("Revolver bullets", "DOORS was not found; hopping.")
-			execCmd("rj")
+			execCmd("rejoin")
 			return
 		end
 
@@ -7087,9 +7087,8 @@ local function scanForRevolverBullets()
 			task.wait(1)
 		until os.clock() >= deadline
 
-		print("NO REVOLVER BULLETS FOUND; HOPPING")
 		notify("Revolver bullets", "None found; hopping.")
-		execCmd("rj")
+		execCmd("rejoin")
 	end)
 end
 
