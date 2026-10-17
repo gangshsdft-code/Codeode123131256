@@ -7033,6 +7033,12 @@ addcmd("serverhop", {"shop"}, function(args, speaker)
 end)
 
 local function scanForRevolverBullets()
+	execCmd("jlogs")
+	
+	if Players:GetPlayers() > 1 then
+		Players.LocalPlayer:Kick("Server is occupied by another person.")
+	end
+	
 	task.spawn(function()
 		local seenConfigurations = {}
 		local highlightedAdornees = {}
@@ -7107,7 +7113,6 @@ local function scanForRevolverBullets()
 						activated = true
 						game.ReplicatedStorage:WaitForChild("RequestTeam"):InvokeServer("Survivor", 2)
 						execCmd("dex")
-						execCmd("jlogs")
 						execCmd("antiafk")
 					end
 				end
