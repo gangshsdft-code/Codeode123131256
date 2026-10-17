@@ -7034,64 +7034,91 @@ end)
 
 local function scanForRevolverBullets()
 	task.spawn(function()
-		notify("Scanning", "Scanning for Revolver Bullets...")
+		local seenConfigurations = {}
+		local highlightedAdornees = {}
+		local activated = false
 
-		local doors = workspace:WaitForChild("DOORS", 5)
-		if not doors then
-			notify("Revolver bullets", "DOORS was not found; hopping.")
-			execCmd("rejoin")
-			return
+		local function addHighlight(adornee)
+			if highlightedAdornees[adornee] or not adornee:IsDescendantOf(game) then
+				return
+			end
+
+			local highlight = Instance.new("Highlight")
+			highlight.Name = "LimboRevolverBulletHighlight"
+			highlight.Adornee = adornee
+			highlight.FillColor = Color3.fromRGB(255, 170, 0)
+			highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+			highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			highlight.Parent = game.CoreGui
+			highlightedAdornees[adornee] = highlight
 		end
 
-		local deadline = os.clock() + 5
-		repeat
-			local foundModels = {}
-			local bulletConfigurations = 0
-			local totalStacks = 0
+		while true do
+			local doors = workspace:FindFirstChild("DOORS")
+			if doors then
+				local safeTarget = doors:FindFirstChild("Safes") and doors.Safes:FindFirstChild("DecrementSafe1")
+				local newConfigurations = 0
+				local totalStacks = 0
 
-			for _, descendant in ipairs(doors:GetDescendants()) do
-				if descendant:IsA("Configuration") and descendant.Name == "Revolver Bullet" then
-					bulletConfigurations += 1
-
-					local stack = descendant:GetAttribute("Stack")
-					if type(stack) == "number" then
-						totalStacks += stack
-					else
-						warn("Revolver Bullet has no numeric Stack attribute:", descendant:GetFullName())
-					end
-
-					local model = descendant:FindFirstAncestorOfClass("Model")
-					if model and not foundModels[model] then
-						foundModels[model] = true
-
-						if not model:FindFirstChild("LimboRevolverBulletHighlight") then
-							local highlight = Instance.new("Highlight")
-							highlight.Name = "LimboRevolverBulletHighlight"
-							highlight.Adornee = model
-							highlight.FillColor = Color3.fromRGB(255, 170, 0)
-							highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
-							highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-							highlight.Parent = game.CoreGui
+				for _, descendant in ipairs(doors:GetDescendants()) do
+					if descendant:IsA("Configuration") and descendant.Name == "Revolver Bullet" then
+						local stack = descendant:GetAttribute("Stack")
+						if type(stack) == "number" then
+							totalStacks += stack
 						end
+
+						local firstAncestorModel = descendant:FindFirstAncestorOfClass("Model")
+						local adornee = firstAncestorModel
+						if firstAncestorModel and firstAncestorModel.Name == "SafeContainer" then
+							adornee = safeTarget
+						end
+
+						if adornee then
+							addHighlight(adornee)
+						end
+
+						if not seenConfigurations[descendant] then
+							seenConfigurations[descendant] = true
+							newConfigurations += 1
+						end
+					end
+				end
+
+				if newConfigurations > 0 then
+					notify(
+						"Revolver bullets found",
+						("Found %d new configuration%s (%s total stacks)."):format(
+							newConfigurations,
+							newConfigurations == 1 and "" or "s",
+							totalStacks
+						)
+					)
+
+					if not activated then
+						activated = true
+						game.ReplicatedStorage:WaitForChild("RequestTeam"):InvokeServer("Survivor", 2)
+						execCmd("dex")
+						execCmd("jlogs")
+						execCmd("antiafk")
 					end
 				end
 			end
 
-			if bulletConfigurations > 0 then
-				local message = ("Revolver bullets: %s"):format(totalStacks)
-				notify("Revolver bullets", message)
-				game.ReplicatedStorage:WaitForChild("RequestTeam"):InvokeServer("Survivor", 2)
-				execCmd("dex")
-				execCmd("jlogs")
-				execCmd("antiafk")
-				return
+			for configuration in pairs(seenConfigurations) do
+				if not configuration:IsDescendantOf(game) then
+					seenConfigurations[configuration] = nil
+				end
 			end
 
-			task.wait(1)
-		until os.clock() >= deadline
+			for adornee, highlight in pairs(highlightedAdornees) do
+				if not adornee:IsDescendantOf(game) then
+					highlight:Destroy()
+					highlightedAdornees[adornee] = nil
+				end
+			end
 
-		notify("Revolver bullets", "None found; hopping.")
-		execCmd("rejoin")
+			task.wait(3)
+		end
 	end)
 end
 
