@@ -7037,6 +7037,10 @@ local function scanForRevolverBullets()
 		local seenConfigurations = {}
 		local highlightedAdornees = {}
 		local activated = false
+		local foundAny = false
+		local initialDeadline = os.clock() + 5
+
+		notify("Scanning", "Scanning for Revolver Bullets...")
 
 		local function addHighlight(adornee)
 			if highlightedAdornees[adornee] or not adornee:IsDescendantOf(game) then
@@ -7085,14 +7089,19 @@ local function scanForRevolverBullets()
 				end
 
 				if newConfigurations > 0 then
-					notify(
-						"Revolver bullets found",
-						("Found %d new configuration%s (%s total stacks)."):format(
-							newConfigurations,
-							newConfigurations == 1 and "" or "s",
-							totalStacks
+					if not foundAny then
+						foundAny = true
+						notify("Revolver bullets", ("Revolver bullets: %s"):format(totalStacks))
+					else
+						notify(
+							"Revolver bullets found",
+							("Found %d new configuration%s (%s total stacks)."):format(
+								newConfigurations,
+								newConfigurations == 1 and "" or "s",
+								totalStacks
+							)
 						)
-					)
+					end
 
 					if not activated then
 						activated = true
@@ -7117,7 +7126,13 @@ local function scanForRevolverBullets()
 				end
 			end
 
-			task.wait(3)
+			if not foundAny and os.clock() >= initialDeadline then
+				notify("Revolver bullets", "None found; hopping.")
+				execCmd("rejoin")
+				return
+			end
+
+			task.wait(foundAny and 3 or 1)
 		end
 	end)
 end
