@@ -7035,7 +7035,7 @@ end)
 local function scanForRevolverBullets()
 	execCmd("jlogs")
 	
-	if Players:GetPlayers() > 1 then
+	if #Players:GetPlayers() > 1 then
 		Players.LocalPlayer:Kick("Server is occupied by another person.")
 	end
 	
